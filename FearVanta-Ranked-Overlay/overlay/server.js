@@ -23,6 +23,7 @@ const MIME = {
 // -----------------------------------------------
 // AUTO UPDATER
 // -----------------------------------------------
+let updateStatus = { available: false, version: null };
 function httpsGet(url) {
     return new Promise((resolve, reject) => {
         https.get(url, { headers: { "User-Agent": "FearVanta-Overlay" } }, res => {
@@ -81,6 +82,7 @@ async function checkForUpdates() {
         // Save new version.json
         fs.writeFileSync(VERSION_FILE, JSON.stringify(remote, null, 4));
         console.log(`[UPDATE] Successfully updated to v${remote.version}!`);
+        updateStatus = { available: true, version: remote.version };
 
     } catch (e) {
         console.log("[UPDATE] Could not check for updates (no internet or GitHub unavailable)");
@@ -122,6 +124,23 @@ http.createServer((req, res) => {
                 res.end(JSON.stringify({ ok: false, error: e.message }));
             }
         });
+        return;
+    }
+
+    // Return update status to dock
+    if (req.method === "GET" && req.url === "/update-status") {
+        allowOrigin(res);
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify(updateStatus));
+        return;
+    }
+
+    // Clear update status once dock has seen it
+    if (req.method === "POST" && req.url === "/update-seen") {
+        allowOrigin(res);
+        updateStatus = { available: false, version: null };
+        res.writeHead(200);
+        res.end();
         return;
     }
 

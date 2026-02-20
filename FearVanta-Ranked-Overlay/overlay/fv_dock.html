@@ -311,7 +311,7 @@
 
     <!-- Top 250 Position -->
     <div class="field">
-        <label>Top 250 Position <span style="opacity:0.4;font-size:10px;text-transform:none;">(0 = not on leaderboard, unlocks when SR > 10000+)</span></label>
+        <label>Top 250 Position <span style="opacity:0.4;font-size:10px;text-transform:none;">(0 = not on leaderboard)</span></label>
         <input type="number" id="leaderboard_pos" min="0" max="250" placeholder="0" value="0" />
     </div>
 
@@ -375,8 +375,8 @@
             { min: 7500,  max: 8300,  name: "Crimson I",    color: "#ff3b3b" },
             { min: 8300,  max: 9100,  name: "Crimson II",   color: "#ff3b3b" },
             { min: 9100,  max: 10000, name: "Crimson III",  color: "#ff3b3b" },
-            { min: 10000, max: 12000, name: "Iridescent",   color: "#b44cff" },
-            { min: 12000, max: 15000, name: "Top 250",      color: "#ffffff" }
+            { min: 10000, max: 13000, name: "Iridescent",   color: "#b44cff" },
+            { min: 13000, max: 15000, name: "Top 250",      color: "#ffffff" }
         ];
 
         function getTier(sr) {
@@ -494,6 +494,32 @@
 
         loadCurrent();
         setInterval(loadCurrent, 5000);
+
+        // Poll for update notifications every 10 seconds
+        async function checkUpdateStatus() {
+            try {
+                const res = await fetch("/update-status");
+                const data = await res.json();
+                if (data.available && data.version) {
+                    showUpdateToast(data.version);
+                    // Mark as seen so it doesn't keep showing
+                    await fetch("/update-seen", { method: "POST" });
+                }
+            } catch(e) {}
+        }
+
+        function showUpdateToast(version) {
+            const t = document.getElementById("toast");
+            t.innerHTML = `⬆ Updated to v${version} — refresh OBS to apply!`;
+            t.className = "toast success show";
+            t.style.cursor = "pointer";
+            t.onclick = () => { t.className = "toast success"; t.style.cursor = ""; };
+            // Keep visible for 10 seconds since it's important
+            setTimeout(() => { t.className = "toast success"; }, 10000);
+        }
+
+        setInterval(checkUpdateStatus, 10000);
+        checkUpdateStatus();
     </script>
 </body>
 </html>
