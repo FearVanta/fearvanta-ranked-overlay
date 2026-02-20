@@ -19,6 +19,64 @@
             --danger: #ff3b3b;
         }
 
+        :root.light {
+            --bg: #f0f2f5;
+            --surface: #ffffff;
+            --border: rgba(0,0,0,0.1);
+            --accent: #0099cc;
+            --accent2: #7c3aed;
+            --text: #1a1a2e;
+            --muted: rgba(0,0,0,0.4);
+            --success: #00aa66;
+            --danger: #cc2200;
+        }
+
+        :root.light select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='rgba(0,0,0,0.4)'/%3E%3C/svg%3E");
+        }
+
+        :root.light input:disabled, :root.light select:disabled {
+            opacity: 0.25;
+        }
+
+        .theme-toggle {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 4px 10px;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            letter-spacing: 0.5px;
+        }
+
+        .theme-toggle:hover {
+            color: var(--text);
+            border-color: var(--accent);
+        }
+
+        /* Top 250 placement badge in preview */
+        .preview-placement {
+            display: none;
+            align-items: center;
+            gap: 4px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 12px;
+            font-weight: 700;
+            color: #ffffff;
+            background: linear-gradient(135deg, #b44cff, #4fd3ff);
+            border-radius: 4px;
+            padding: 2px 8px;
+            margin-left: 6px;
+        }
+
+        .preview-placement.show {
+            display: flex;
+        }
+
         body {
             background: var(--bg);
             color: var(--text);
@@ -274,7 +332,10 @@
 
     <div class="header">
         <div class="logo">FEARVANTA</div>
-        <div class="version">RANKED DOCK v1.0</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+            <div class="version">RANKED DOCK v1.0</div>
+            <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">☀ LIGHT</button>
+        </div>
     </div>
 
     <div class="status-bar">
@@ -291,6 +352,7 @@
         <div class="sr-progress" style="flex:1; margin:0 10px; align-self:center;">
             <div class="sr-progress-fill" id="progressFill"></div>
         </div>
+        <span class="preview-placement" id="previewPlacement">👑 #0</span>
         <div class="preview-sr" id="previewSR">SR: 0</div>
     </div>
 
@@ -383,18 +445,32 @@
             return tiers.find(t => sr >= t.min && sr < t.max) || tiers[0];
         }
 
-        function updatePreview(sr) {
-            const tier = getTier(sr);
+        function updatePreview(sr, pos) {
+            const position = pos ?? parseInt(document.getElementById("leaderboard_pos").value) || 0;
+            const isTop250 = sr >= 10000 && position >= 1 && position <= 250;
+            const tier = isTop250
+                ? { name: "Top 250", color: "#ffffff", min: 10000, max: 99999 }
+                : getTier(sr);
+
             document.getElementById("previewRank").textContent = tier.name;
             document.getElementById("previewRank").style.color = tier.color;
             document.getElementById("previewSR").textContent = "SR: " + sr;
-            document.getElementById("previewTier").textContent = "TIER " + (tiers.indexOf(tier) + 1) + " OF " + tiers.length;
+            document.getElementById("previewTier").textContent = "TIER " + (tiers.indexOf(getTier(sr)) + 1) + " OF " + tiers.length;
 
-            const pct = ((sr - tier.min) / (tier.max - tier.min)) * 100;
+            const pct = ((sr - getTier(sr).min) / (getTier(sr).max - getTier(sr).min)) * 100;
             document.getElementById("progressFill").style.width = pct + "%";
             document.getElementById("progressFill").style.background = tier.color;
             document.getElementById("inputProgressFill").style.width = pct + "%";
             document.getElementById("inputProgressFill").style.background = tier.color;
+
+            // Show/hide placement badge
+            const badge = document.getElementById("previewPlacement");
+            if (isTop250) {
+                badge.textContent = "👑 #" + position;
+                badge.classList.add("show");
+            } else {
+                badge.classList.remove("show");
+            }
         }
 
         // Opacity slider live update
@@ -417,6 +493,10 @@
 
         let userTyping = false;
         let typingTimer = null;
+
+        document.getElementById("leaderboard_pos").addEventListener("input", function() {
+            updatePreview(parseInt(document.getElementById("sr").value) || 0, parseInt(this.value) || 0);
+        });
 
         ["username", "sr", "opacity", "background", "layout", "leaderboard_pos"].forEach(id => {
             const el = document.getElementById(id);
@@ -520,6 +600,19 @@
 
         setInterval(checkUpdateStatus, 10000);
         checkUpdateStatus();
+
+        // Theme toggle
+        function toggleTheme() {
+            const isLight = document.documentElement.classList.toggle("light");
+            document.getElementById("themeToggle").textContent = isLight ? "🌙 DARK" : "☀ LIGHT";
+            localStorage.setItem("fv_theme", isLight ? "light" : "dark");
+        }
+
+        // Load saved theme
+        if (localStorage.getItem("fv_theme") === "light") {
+            document.documentElement.classList.add("light");
+            document.getElementById("themeToggle").textContent = "🌙 DARK";
+        }
     </script>
 </body>
 </html>
