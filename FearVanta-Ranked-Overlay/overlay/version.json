@@ -1,0 +1,10 @@
+{
+    "version": "1.0.0",
+    "files": [
+        "fv_overlay.html",
+        "fv_logic.js",
+        "fv_style.css",
+        "fv_dock.html",
+        "server.js"
+    ]
+}
