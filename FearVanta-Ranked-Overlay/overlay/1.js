@@ -24,6 +24,7 @@ const MIME = {
 // AUTO UPDATER
 // -----------------------------------------------
 let updateStatus = { available: false, version: null };
+let dockTheme = { theme: "dark" };
 function httpsGet(url) {
     return new Promise((resolve, reject) => {
         https.get(url, { headers: { "User-Agent": "FearVanta-Overlay" } }, res => {
@@ -122,6 +123,31 @@ http.createServer((req, res) => {
             } catch (e) {
                 res.writeHead(500, { "Content-Type": "application/json" });
                 res.end(JSON.stringify({ ok: false, error: e.message }));
+            }
+        });
+        return;
+    }
+
+    // Theme save/load
+    if (req.method === "GET" && req.url === "/theme") {
+        allowOrigin(res);
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify(dockTheme));
+        return;
+    }
+
+    if (req.method === "POST" && req.url === "/save-theme") {
+        allowOrigin(res);
+        let body = "";
+        req.on("data", chunk => body += chunk);
+        req.on("end", () => {
+            try {
+                dockTheme = JSON.parse(body);
+                res.writeHead(200);
+                res.end();
+            } catch(e) {
+                res.writeHead(400);
+                res.end();
             }
         });
         return;

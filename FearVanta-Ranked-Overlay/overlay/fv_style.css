@@ -1,7 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Mulish:wght@400;600;700;800&display=swap');
 body {
     margin: 0;
     background: transparent;
-    font-family: "Inter", system-ui, sans-serif;
+    font-family: "Mulish", sans-serif;
+    padding: 20px;
 }
 
 #overlay {
@@ -28,6 +30,9 @@ body {
         0 0 24px rgba(0,0,0,0.8),
         0 0 24px rgba(0,0,0,0.9),
         0 0 32px color-mix(in srgb, var(--rank-color) 40%, transparent);
+
+    /* Left edge accent bar */
+    border-left: 3px solid var(--rank-color);
 }
 
 /* Background templates + brand color */
@@ -88,8 +93,8 @@ body {
 
 #iconWrap {
     position: relative;
-    width: 75px;
-    height: 75px;
+    width: 54px;
+    height: 54px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -112,8 +117,8 @@ body {
 
 #rankIcon {
     position: relative;
-    width: 75px;
-    height: 75px;
+    width: 54px;
+    height: 54px;
     object-fit: contain;
     z-index: 1;
 }
@@ -174,10 +179,11 @@ body {
     bottom: 4px;
     left: 50%;
     transform: translateX(-50%);
-    font-size: 10px;
-    font-weight: 600;
-    opacity: 0.45;
-    letter-spacing: 0.4px;
+    font-size: 8px;
+    font-weight: 500;
+    opacity: 0.5;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
     pointer-events: none;
     user-select: none;
     color: var(--brand-color);
@@ -186,7 +192,7 @@ body {
 #fvBrandInside #fvVersion {
     margin-left: 6px;
     font-size: 9px;
-    opacity: 0.75;
+    opacity: 1.0;
 }
 
 /* =============================================
@@ -205,13 +211,13 @@ body {
 }
 
 #overlay.vertical #iconWrap {
-    width: 125px;
-    height: 125px;
+    width: 80px;
+    height: 80px;
 }
 
 #overlay.vertical #rankIcon {
-    width: 125px;
-    height: 125px;
+    width: 80px;
+    height: 80px;
 }
 
 #overlay.vertical #iconWrap::before {

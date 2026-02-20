@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>FearVanta Control Dock</title>
+    <title>PROJECT OBSIDIAN Control Dock</title>
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -33,6 +33,10 @@
 
         :root.light select {
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='rgba(0,0,0,0.4)'/%3E%3C/svg%3E");
+        }
+
+        :root.light #dockLogo {
+            filter: invert(1);
         }
 
         :root.light input:disabled, :root.light select:disabled {
@@ -331,9 +335,9 @@
 <body>
 
     <div class="header">
-        <div class="logo">FEARVANTA</div>
+        <img id="dockLogo" src="assets/icons/ProjectObsidian.png" style="height:28px;width:auto;object-fit:contain;transition:filter 0.2s;" alt="ObsidianHUD" />
         <div style="display:flex;align-items:center;gap:8px;">
-            <div class="version">RANKED DOCK v1.0</div>
+            <div class="version">PROJECT OBSIDIAN v1.0</div>
             <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">☀ LIGHT</button>
         </div>
     </div>
@@ -446,7 +450,7 @@
         }
 
         function updatePreview(sr, pos) {
-            const position = pos ?? parseInt(document.getElementById("leaderboard_pos").value) || 0;
+            const position = (pos != null) ? pos : (parseInt(document.getElementById("leaderboard_pos").value) || 0);
             const isTop250 = sr >= 10000 && position >= 1 && position <= 250;
             const tier = isTop250
                 ? { name: "Top 250", color: "#ffffff", min: 10000, max: 99999 }
@@ -601,18 +605,32 @@
         setInterval(checkUpdateStatus, 10000);
         checkUpdateStatus();
 
-        // Theme toggle
-        function toggleTheme() {
+        // Theme toggle — saved via server so it persists across refreshes
+        async function toggleTheme() {
             const isLight = document.documentElement.classList.toggle("light");
             document.getElementById("themeToggle").textContent = isLight ? "🌙 DARK" : "☀ LIGHT";
-            localStorage.setItem("fv_theme", isLight ? "light" : "dark");
+            try {
+                await fetch("/save-theme", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ theme: isLight ? "light" : "dark" })
+                });
+            } catch(e) {}
         }
 
-        // Load saved theme
-        if (localStorage.getItem("fv_theme") === "light") {
-            document.documentElement.classList.add("light");
-            document.getElementById("themeToggle").textContent = "🌙 DARK";
+        // Load saved theme from server
+        async function loadTheme() {
+            try {
+                const res = await fetch("/theme");
+                const data = await res.json();
+                if (data.theme === "light") {
+                    document.documentElement.classList.add("light");
+                    document.getElementById("themeToggle").textContent = "🌙 DARK";
+                }
+            } catch(e) {}
         }
+
+        loadTheme();
     </script>
 </body>
 </html>
