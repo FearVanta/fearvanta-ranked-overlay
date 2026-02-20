@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ObsidianHUD — Ranked Overlay for Black Ops 7</title>
+    <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;500;600;700;800;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #070709;
+            --surface: #0f0f14;
+            --surface2: #16161e;
+            --border: rgba(255,255,255,0.06);
+            --accent: #4fd3ff;
+            --accent2: #b44cff;
+            --text: #e8e8f0;
+            --muted: rgba(255,255,255,0.4);
+            --gold: #ffd700;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Mulish', sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Grain overlay */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 100;
+            opacity: 0.4;
+        }
+
+        /* NAV */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 40px;
+            background: rgba(7,7,9,0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .nav-logo img {
+            height: 32px;
+            width: auto;
+        }
+
+        .nav-logo span {
+            font-size: 16px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover, .nav-links a.active { color: var(--text); }
+
+        .nav-cta {
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
+            color: #000 !important;
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-weight: 700 !important;
+            -webkit-text-fill-color: #000 !important;
+        }
+
+        /* HERO */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 120px 40px 80px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: "";
+            position: absolute;
+            top: -200px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(79,211,255,0.06) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero::after {
+            content: "";
+            position: absolute;
+            bottom: -100px;
+            right: -100px;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(180,76,255,0.05) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            padding: 6px 14px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 28px;
+            animation: fadeUp 0.6s ease both;
+        }
+
+        .hero-badge::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 6px var(--accent);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        h1 {
+            font-size: clamp(48px, 8vw, 96px);
+            font-weight: 900;
+            line-height: 1;
+            letter-spacing: -2px;
+            margin-bottom: 8px;
+            animation: fadeUp 0.6s 0.1s ease both;
+        }
+
+        h1 span {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-sub {
+            font-size: clamp(14px, 2vw, 18px);
+            font-weight: 500;
+            color: var(--muted);
+            margin-bottom: 48px;
+            max-width: 480px;
+            line-height: 1.6;
+            animation: fadeUp 0.6s 0.2s ease both;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            justify-content: center;
+            animation: fadeUp 0.6s 0.3s ease both;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
+            color: #000;
+            font-family: 'Mulish', sans-serif;
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            padding: 14px 28px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: opacity 0.2s, transform 0.15s;
+        }
+
+        .btn-primary:hover { opacity: 0.85; transform: translateY(-1px); }
+
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-family: 'Mulish', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            padding: 14px 28px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: border-color 0.2s, transform 0.15s;
+        }
+
+        .btn-secondary:hover { border-color: var(--accent); transform: translateY(-1px); }
+
+        /* OVERLAY PREVIEW MOCKUP */
+        .hero-preview {
+            margin-top: 80px;
+            position: relative;
+            animation: fadeUp 0.6s 0.4s ease both;
+        }
+
+        .overlay-mockup {
+            display: inline-flex;
+            align-items: center;
+            gap: 18px;
+            padding: 16px 24px 24px;
+            border-radius: 12px;
+            background: rgba(10,10,10,0.95);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-left: 3px solid var(--gold);
+            box-shadow:
+                0 0 40px rgba(0,0,0,0.8),
+                0 0 60px rgba(255,215,0,0.15);
+            position: relative;
+        }
+
+        .mockup-icon {
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,215,0,0.3), transparent 70%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+
+        .mockup-divider {
+            width: 1px;
+            height: 40px;
+            background: rgba(255,215,0,0.5);
+        }
+
+        .mockup-username {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .mockup-rank {
+            font-size: 18px;
+            font-weight: 600;
+            opacity: 0.9;
+            color: var(--gold);
+        }
+
+        .mockup-sr {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .mockup-sr-badge {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .mockup-sr-val {
+            font-size: 28px;
+            font-weight: 800;
+        }
+
+        .mockup-brand {
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 8px;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            opacity: 0.4;
+            white-space: nowrap;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* FEATURES */
+        .section {
+            padding: 100px 40px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .section-label {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 12px;
+        }
+
+        .section-title {
+            font-size: clamp(32px, 5vw, 52px);
+            font-weight: 900;
+            letter-spacing: -1px;
+            line-height: 1.1;
+            margin-bottom: 16px;
+        }
+
+        .section-desc {
+            font-size: 16px;
+            color: var(--muted);
+            max-width: 500px;
+            line-height: 1.7;
+            margin-bottom: 60px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+        }
+
+        .feature-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 28px;
+            transition: border-color 0.2s, transform 0.2s;
+        }
+
+        .feature-card:hover {
+            border-color: rgba(79,211,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .feature-icon {
+            font-size: 28px;
+            margin-bottom: 16px;
+        }
+
+        .feature-title {
+            font-size: 17px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .feature-desc {
+            font-size: 14px;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        /* RANKS SECTION */
+        .ranks-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 10px;
+        }
+
+        .rank-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .rank-name {
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .rank-sr {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        /* DIVIDER */
+        .section-divider {
+            height: 1px;
+            background: var(--border);
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* FOOTER */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .footer-brand {
+            font-size: 12px;
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 24px;
+        }
+
+        .footer-links a {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover { color: var(--text); }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html" class="nav-logo">
+            <span>OBSIDIANHUD</span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="index.html" class="active">Home</a></li>
+            <li><a href="download.html">Download</a></li>
+            <li><a href="setup.html">Setup Guide</a></li>
+            <li><a href="download.html" class="nav-cta">Download Free</a></li>
+        </ul>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-badge">Black Ops 7 Ranked Overlay</div>
+        <h1>OBSIDIAN<span>HUD</span></h1>
+        <p class="hero-sub">A premium ranked overlay for OBS and Meld Studio. Auto-updating rank badges, Top 250 detection, and full stream control — all from one dock.</p>
+        <div class="hero-buttons">
+            <a href="download.html" class="btn-primary">⬇ Download Free</a>
+            <a href="setup.html" class="btn-secondary">Setup Guide →</a>
+        </div>
+
+        <!-- Live overlay mockup -->
+        <div class="hero-preview">
+            <div class="overlay-mockup">
+                <div class="mockup-icon">🏆</div>
+                <div class="mockup-divider"></div>
+                <div>
+                    <div class="mockup-username">@fearvanta</div>
+                    <div class="mockup-rank">Gold I</div>
+                </div>
+                <div class="mockup-sr">
+                    <div class="mockup-sr-badge">SR</div>
+                    <div class="mockup-sr-val">2317</div>
+                </div>
+                <div class="mockup-brand">ObsidianHUD by FearVanta</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- FEATURES -->
+    <section class="section">
+        <div class="section-label">Features</div>
+        <h2 class="section-title">Everything you need<br>on stream</h2>
+        <p class="section-desc">Built specifically for Black Ops 7 ranked — every feature is designed around how the game actually works.</p>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🎖️</div>
+                <div class="feature-title">Auto Rank Detection</div>
+                <div class="feature-desc">Enter your SR and the overlay automatically switches to the correct rank badge — Bronze all the way to Iridescent.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">👑</div>
+                <div class="feature-title">Top 250 System</div>
+                <div class="feature-desc">Hit 10,000 SR and enter your leaderboard position. The overlay instantly switches to the Top 250 badge and shows your placement.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎬</div>
+                <div class="feature-title">Animated .webm Icons</div>
+                <div class="feature-desc">All rank icons are animated .webm files that loop seamlessly. Each rank has its own unique animated badge.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🖥️</div>
+                <div class="feature-title">OBS & Meld Studio</div>
+                <div class="feature-desc">Works with both OBS Studio and Meld Studio as a Browser Source. No plugins required — just a URL.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚙️</div>
+                <div class="feature-title">Built-in Control Dock</div>
+                <div class="feature-desc">Update your SR, username, background theme and opacity directly from a custom OBS dock. No files to edit.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔄</div>
+                <div class="feature-title">Auto Updates</div>
+                <div class="feature-desc">The overlay checks for updates automatically every 2 hours. New versions download silently and notify you in the dock.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📐</div>
+                <div class="feature-title">Horizontal & Vertical</div>
+                <div class="feature-desc">Switch between horizontal and vertical layouts instantly from the dock. No restart or file changes needed.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎨</div>
+                <div class="feature-title">9 Background Templates</div>
+                <div class="feature-desc">Choose from Classic Dark, Neon Grid, Aurora, Crimson Flame, Frozen Ice and more. All with adjustable opacity.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🚀</div>
+                <div class="feature-title">Auto-Start on Boot</div>
+                <div class="feature-desc">The overlay server starts silently every time Windows boots. Nothing to run before going live — it's just always ready.</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- RANK TIERS -->
+    <section class="section">
+        <div class="section-label">Rank Tiers</div>
+        <h2 class="section-title">All 20 ranks supported</h2>
+        <p class="section-desc">From Bronze I all the way to Top 250 — every rank is covered with automatic badge switching.</p>
+
+        <div class="ranks-grid">
+            <div class="rank-card"><span class="rank-name" style="color:#b87333">Bronze I</span><span class="rank-sr">0 – 299</span></div>
+            <div class="rank-card"><span class="rank-name" style="color:#b87333">Bronze II</span><span class="rank-sr">300 – 599</span></div>
+            <div class="rank-card"><span class="rank-name" style="color:#b87333">Bronze III</span><span class="rank-sr">600 – 899</span></div>
+            <div class="rank-card"><span class="rank-name" style="color:#c0c0c0">Silver I</span><span class="rank-sr">900 – 1,299</span></div>
+            <div class="rank-card"><span class="rank-name" style="color:#c0c0c0">Silver II</span><span class="rank-sr">1,300 – 1,699</span></div>
+            <div class="rank-card"><span class="rank-name" style="color:#c0c0c0">Silver III</span><span class="rank-sr">1,700 – 2,099</span></div>
+            <div class="rank-card"><span class="rank-name" style="color:#ffd700">Gold I</span><span class="rank-sr">2,100 – 2,599</span></div>
+            <div class="rank-card"><span class="rank-name" style="color:#ffd700">Gold II</span><span class="rank-sr">2,600 – 3,099</span></div>
+            <div class="rank-card"><span class="rank-name" style="color:#ffd700">Gold III</span><span class="rank-sr">3,100 – 3,599</span></div>
+            <div class="rank-card"><span class="rank-name" style="color:#4fd3ff">Platinum I</span><span class="rank-sr">3,600 – 4,199</span></div>
+            <div class="rank-card"><span class="rank-name" style="color:#4fd3ff">Platinum II</span><span class="rank-sr">4,200 – 4,799</span></div>
+            <div class="rank-card"><span class="rank-name" style="color:#4fd3ff">Platinum III</span><span class="rank-sr">4,800 – 5,399</span></div>
+            <div class="rank-card"><span class="rank-name" style="color:#4a90ff">Diamond I</span><span class="rank-sr">5,400 – 6,099</span></div>
+            <div class="rank-card"><span class="rank-name" style="color:#4a90ff">Diamond II</span><span class="rank-sr">6,100 – 6,799</span></div>
+            <div class="rank-card"><span class="rank-name" style="color:#4a90ff">Diamond III</span><span class="rank-sr">6,800 – 7,499</span></div>
+            <div class="rank-card"><span class="rank-name" style="color:#ff3b3b">Crimson I</span><span class="rank-sr">7,500 – 8,299</span></div>
+            <div class="rank-card"><span class="rank-name" style="color:#ff3b3b">Crimson II</span><span class="rank-sr">8,300 – 9,099</span></div>
+            <div class="rank-card"><span class="rank-name" style="color:#ff3b3b">Crimson III</span><span class="rank-sr">9,100 – 9,999</span></div>
+            <div class="rank-card"><span class="rank-name" style="color:#b44cff">Iridescent</span><span class="rank-sr">10,000+</span></div>
+            <div class="rank-card"><span class="rank-name" style="color:#ffffff">👑 Top 250</span><span class="rank-sr">#1 – #250</span></div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- CTA -->
+    <section class="section" style="text-align:center;">
+        <h2 class="section-title">Ready to go live?</h2>
+        <p class="section-desc" style="margin:0 auto 40px;">Free to download. Works on any PC. Takes less than 5 minutes to set up.</p>
+        <a href="download.html" class="btn-primary" style="font-size:16px;padding:16px 36px;">⬇ Download ObsidianHUD Free</a>
+    </section>
+
+    <footer>
+        <div class="footer-brand">ObsidianHUD by FearVanta — Black Ops 7 Ranked Overlay</div>
+        <div class="footer-links">
+            <a href="index.html">Home</a>
+            <a href="download.html">Download</a>
+            <a href="setup.html">Setup Guide</a>
+            <a href="https://github.com/FearVanta/fearvanta-ranked-overlay" target="_blank">GitHub</a>
+        </div>
+    </footer>
+
+</body>
+</html>
