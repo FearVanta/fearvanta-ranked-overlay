@@ -1,5 +1,5 @@
 {
-    "version": "1.1.0",
+    "version": "1.1.1",
     "files": [
         "fv_overlay.html",
         "fv_logic.js",
