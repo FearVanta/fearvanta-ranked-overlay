@@ -1,0 +1,278 @@
+@import url('https://fonts.googleapis.com/css2?family=Mulish:wght@400;600;700;800&display=swap');
+body {
+    margin: 0;
+    background: transparent;
+    font-family: "Mulish", sans-serif;
+    padding: 20px;
+}
+
+#overlay {
+    position: relative;
+
+    --rank-color: #b87333;
+    --bg-opacity: 0.85;
+
+    display: flex;
+    align-items: center;
+    gap: 18px;
+
+    padding: 14px 22px;
+    border-radius: 12px;
+
+    border: 1px solid rgba(255,255,255,0.12);
+    backdrop-filter: blur(6px);
+
+    color: white;
+    width: fit-content;
+
+    box-shadow:
+        0 0 18px rgba(0,0,0,0.6),
+        0 0 24px rgba(0,0,0,0.8),
+        0 0 24px rgba(0,0,0,0.9),
+        0 0 32px color-mix(in srgb, var(--rank-color) 40%, transparent);
+
+    /* Left edge accent bar */
+    border-left: 3px solid var(--rank-color);
+}
+
+/* Background templates + brand color */
+
+#overlay.classic-dark {
+    background: rgba(10,10,10,var(--bg-opacity));
+    --brand-color: rgba(255,255,255,0.55);
+}
+
+#overlay.dark-glass {
+    background: rgba(10,10,10,var(--bg-opacity));
+    border: 1px solid rgba(255,255,255,0.18);
+    backdrop-filter: blur(10px);
+    --brand-color: rgba(255,255,255,0.55);
+}
+
+#overlay.neon-grid {
+    background:
+        linear-gradient(135deg, rgba(0,0,0,var(--bg-opacity)), rgba(10,10,30,var(--bg-opacity))),
+        repeating-linear-gradient(90deg, rgba(0,255,255,0.12) 0, rgba(0,255,255,0.12) 1px, transparent 1px, transparent 12px),
+        repeating-linear-gradient(0deg, rgba(0,255,255,0.12) 0, rgba(0,255,255,0.12) 1px, transparent 1px, transparent 12px);
+    --brand-color: rgba(0,255,255,0.55);
+}
+
+#overlay.cyber-wave {
+    background: linear-gradient(135deg, rgba(10,10,30,var(--bg-opacity)), rgba(0,180,255,var(--bg-opacity)));
+    --brand-color: rgba(0,180,255,0.55);
+}
+
+#overlay.matrix {
+    background:
+        linear-gradient(135deg, rgba(0,0,0,var(--bg-opacity)), rgba(0,40,0,var(--bg-opacity)));
+    --brand-color: rgba(0,255,0,0.55);
+}
+
+#overlay.aurora {
+    background: linear-gradient(135deg, rgba(10,10,40,var(--bg-opacity)), rgba(0,200,255,var(--bg-opacity)), rgba(200,0,255,var(--bg-opacity)));
+    --brand-color: rgba(200,255,255,0.55);
+}
+
+#overlay.crimson-flame {
+    background: linear-gradient(135deg, rgba(30,0,0,var(--bg-opacity)), rgba(255,60,60,var(--bg-opacity)));
+    --brand-color: rgba(255,120,120,0.55);
+}
+
+#overlay.frozen-ice {
+    background: linear-gradient(135deg, rgba(0,20,40,var(--bg-opacity)), rgba(180,220,255,var(--bg-opacity)));
+    --brand-color: rgba(180,220,255,0.55);
+}
+
+#overlay.marble-white {
+    background: linear-gradient(135deg, rgba(230,230,230,var(--bg-opacity)), rgba(255,255,255,var(--bg-opacity)));
+    color: #111;
+    --brand-color: rgba(0,0,0,0.55);
+}
+
+/* Icon + glow */
+
+#iconWrap {
+    position: relative;
+    width: 54px;
+    height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#iconWrap::before {
+    content: "";
+    position: absolute;
+    inset: -6px;
+    border-radius: 999px;
+    background: radial-gradient(
+        circle,
+        color-mix(in srgb, var(--rank-color) 60%, transparent) 0%,
+        transparent 70%
+    );
+    opacity: 0.9;
+    filter: blur(6px);
+    z-index: 0;
+}
+
+#rankIcon {
+    position: relative;
+    width: 54px;
+    height: 54px;
+    object-fit: contain;
+    z-index: 1;
+}
+
+/* Divider */
+
+#divider {
+    width: 1px;
+    height: 40px;
+    background: color-mix(in srgb, var(--rank-color) 70%, rgba(255,255,255,0.2));
+    opacity: 0.9;
+}
+
+/* Text + SR */
+
+#username {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+#rankText {
+    font-size: 18px;
+    font-weight: 600;
+    opacity: 0.9;
+}
+
+#srContainer {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+#srIcon {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+}
+
+#srValue {
+    font-size: 28px;
+    font-weight: 700;
+}
+
+#srChange {
+    font-size: 20px;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+#srChange.show {
+    opacity: 1;
+}
+
+/* Bottom-centered branding + version */
+#fvBrandInside {
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 8px;
+    font-weight: 500;
+    opacity: 0.5;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    pointer-events: none;
+    user-select: none;
+    color: var(--brand-color);
+}
+
+#fvBrandInside #fvVersion {
+    margin-left: 6px;
+    font-size: 9px;
+    opacity: 1.0;
+}
+
+/* =============================================
+   VERTICAL LAYOUT
+   ============================================= */
+
+#overlay.vertical {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 20px 24px 28px;
+    width: fit-content;
+    min-width: 160px;
+    text-align: center;
+}
+
+#overlay.vertical #iconWrap {
+    width: 80px;
+    height: 80px;
+}
+
+#overlay.vertical #rankIcon {
+    width: 80px;
+    height: 80px;
+}
+
+#overlay.vertical #iconWrap::before {
+    inset: -10px;
+    filter: blur(12px);
+    opacity: 1;
+}
+
+/* Hide horizontal divider in vertical mode */
+#overlay.vertical #divider {
+    display: none;
+}
+
+#overlay.vertical #rankText {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+#overlay.vertical #srContainer {
+    justify-content: center;
+    gap: 6px;
+}
+
+#overlay.vertical #srValue {
+    font-size: 32px;
+    font-weight: 700;
+}
+
+#overlay.vertical #srIcon {
+    width: 26px;
+    height: 26px;
+}
+
+/* Vertical divider line between SR and username */
+#vDivider {
+    display: none;
+}
+
+#overlay.vertical #vDivider {
+    display: block;
+    width: 60%;
+    height: 1px;
+    background: color-mix(in srgb, var(--rank-color) 70%, rgba(255,255,255,0.2));
+    opacity: 0.7;
+    margin: 2px 0;
+}
+
+#overlay.vertical #username {
+    font-size: 16px;
+    font-weight: 600;
+    opacity: 0.9;
+    letter-spacing: 0.3px;
+}
+
+#overlay.vertical #fvBrandInside {
+    bottom: 6px;
+}

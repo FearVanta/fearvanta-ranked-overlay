@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>FearVanta Ranked Overlay</title>
+    <link rel="stylesheet" href="fv_style.css" />
+    <script defer src="fv_logic.js"></script>
+</head>
+
+<body>
+
+    <div id="overlay" class="classic-dark">
+
+        <div id="iconWrap">
+            <!-- Updated from <img> to <video> -->
+            <video id="rankIcon" autoplay loop muted playsinline>
+                <source id="rankIconSource" src="assets/icons/bronze.webm" type="video/webm">
+            </video>
+        </div>
+
+        <div id="divider"></div>
+
+        <div id="username">@USERNAME</div>
+
+        <div id="rankText">Bronze I</div>
+
+        <div id="srContainer">
+            <img id="srIcon" src="assets/icons/sr.png" />
+            <div id="srValue">0</div>
+        </div>
+
+        <!-- Vertical divider -->
+        <div id="vDivider"></div>
+
+        <!-- Bottom-centered branding + version -->
+        <div id="fvBrandInside">Project Obsidian by FearVanta </div>
+
+    </div>
+
+</body>
+</html>
