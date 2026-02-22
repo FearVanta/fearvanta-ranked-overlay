@@ -29,7 +29,7 @@ const TIERS = [
     { name: "Diamond III",  min: 6800,  max: 7500,  icon: "diamond",    color: "#4a90ff" },
     { name: "Crimson I",    min: 7500,  max: 8300,  icon: "crimson",    color: "#ff3b3b" },
     { name: "Crimson II",   min: 8300,  max: 9100,  icon: "crimson",    color: "#ff3b3b" },
-    { name: "Crimson III",  min: 9100,  max: 10000, icon: "crimson",    color: "#ff3b3b" },
+    { name: "Crimson III",  min: 9100,  max: 9999, icon: "crimson",    color: "#ff3b3b" },
     { name: "Iridescent",   min: 10000, max: 99999, icon: "iridescent", color: "#b44cff" },
 ];
 
