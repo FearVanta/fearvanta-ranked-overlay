@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Terms & Conditions — Project Obsidian</title>
+    <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;500;600;700;800;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #070709; --surface: #0f0f14; --surface2: #16161e;
+            --border: rgba(255,255,255,0.06); --accent: #4fd3ff; --accent2: #b44cff;
+            --text: #e8e8f0; --muted: rgba(255,255,255,0.4); --success: #00d632;
+        }
+        html { scroll-behavior: smooth; }
+        body { background: var(--bg); color: var(--text); font-family: 'Mulish', sans-serif; overflow-x: hidden; min-height: 100vh; }
+        body::before { content: ""; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events: none; z-index: 100; opacity: 0.4; }
+
+        nav { position: fixed; top: 0; left: 0; right: 0; z-index: 50; display: flex; align-items: center; justify-content: space-between; padding: 16px 40px; background: rgba(7,7,9,0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
+        .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+        .nav-logo img { height: 28px; width: auto; filter: brightness(0) invert(1); }
+        .nav-logo span { font-size: 16px; font-weight: 800; letter-spacing: 1px; background: linear-gradient(90deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .nav-links { display: flex; align-items: center; gap: 32px; list-style: none; }
+        .nav-links a { color: var(--muted); text-decoration: none; font-size: 13px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; transition: color 0.2s; }
+        .nav-links a:hover, .nav-links a.active { color: var(--text); }
+        .nav-cta { background: linear-gradient(90deg, var(--accent), var(--accent2)); color: #000 !important; padding: 8px 20px; border-radius: 6px; font-weight: 700 !important; -webkit-text-fill-color: #000 !important; }
+
+        .page-header { padding: 160px 40px 60px; text-align: center; }
+        .section-label { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+        h1 { font-size: clamp(36px, 5vw, 60px); font-weight: 900; letter-spacing: -2px; margin-bottom: 16px; }
+        .page-desc { font-size: 14px; color: var(--muted); max-width: 480px; margin: 0 auto; line-height: 1.7; }
+
+        .section { padding: 40px 40px 100px; max-width: 760px; margin: 0 auto; }
+
+        .terms-block { margin-bottom: 40px; }
+        .terms-block h2 { font-size: 18px; font-weight: 800; margin-bottom: 12px; color: var(--text); border-left: 3px solid var(--accent); padding-left: 14px; }
+        .terms-block p { font-size: 14px; color: var(--muted); line-height: 1.8; margin-bottom: 10px; }
+        .terms-block ul { list-style: none; margin: 10px 0; }
+        .terms-block ul li { font-size: 14px; color: var(--muted); padding: 4px 0 4px 16px; position: relative; line-height: 1.6; }
+        .terms-block ul li::before { content: "→"; position: absolute; left: 0; color: var(--accent); font-size: 12px; }
+
+        .highlight-box { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--success); border-radius: 8px; padding: 20px 24px; margin: 20px 0; }
+        .highlight-box p { font-size: 14px; color: var(--text); line-height: 1.7; margin: 0; }
+        .highlight-box strong { color: var(--success); }
+
+        .donate-box { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 32px; text-align: center; margin: 40px 0; }
+        .donate-box h2 { font-size: 22px; font-weight: 900; margin-bottom: 10px; }
+        .donate-box p { font-size: 14px; color: var(--muted); margin-bottom: 24px; line-height: 1.6; }
+        .btn-donate { display: inline-flex; align-items: center; gap: 8px; background: #00d632; color: #000; font-family: 'Mulish', sans-serif; font-size: 15px; font-weight: 800; padding: 14px 32px; border-radius: 8px; text-decoration: none; transition: opacity 0.2s, transform 0.15s; }
+        .btn-donate:hover { opacity: 0.85; transform: translateY(-1px); }
+
+        .last-updated { font-family: 'Share Tech Mono', monospace; font-size: 11px; color: var(--muted); margin-bottom: 40px; }
+
+        footer { border-top: 1px solid var(--border); padding: 40px; display: flex; align-items: center; justify-content: space-between; max-width: 1100px; margin: 0 auto; }
+        .footer-brand { font-size: 12px; color: var(--muted); font-weight: 500; }
+        .footer-links { display: flex; gap: 24px; }
+        .footer-links a { color: var(--muted); text-decoration: none; font-size: 12px; font-weight: 600; transition: color 0.2s; }
+        .footer-links a:hover { color: var(--text); }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html" class="nav-logo">
+            <img src="FearVanta-Ranked-Overlay/overlay/assets/icons/ProjectObsidian.png" alt="Project Obsidian Logo">
+            <span>PROJECT OBSIDIAN</span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="download.html">Download</a></li>
+            <li><a href="setup.html">Setup Guide</a></li>
+            <li><a href="download.html" class="nav-cta">Download Free</a></li>
+        </ul>
+    </nav>
+
+    <div class="page-header">
+        <div class="section-label">Legal</div>
+        <h1>Terms & Conditions</h1>
+        <p class="page-desc">Please read these terms before making a donation or using Project Obsidian.</p>
+    </div>
+
+    <section class="section">
+
+        <div class="last-updated">Last updated: February 2026</div>
+
+        <!-- Donation box -->
+        <div class="donate-box">
+            <h2>💚 Support Project Obsidian</h2>
+            <p>Project Obsidian is completely free. If you enjoy it and want to support development, donations are always appreciated but never required.</p>
+            <a href="https://cash.app/$EG6Jayy" target="_blank" class="btn-donate">💚 Donate via CashApp</a>
+        </div>
+
+        <!-- Terms blocks -->
+        <div class="terms-block">
+            <h2>1. Free Software</h2>
+            <p>Project Obsidian is provided completely free of charge. You are not required to pay anything to download, use, or share this software. All features are available at no cost.</p>
+        </div>
+
+        <div class="terms-block">
+            <h2>2. Donations</h2>
+            <p>Donations are entirely voluntary and made at the donor's own discretion. By making a donation you agree to the following:</p>
+            <ul>
+                <li>All donations are final and non-refundable</li>
+                <li>Donations do not grant any special access, features, or privileges</li>
+                <li>Donations are not purchases — no goods or services are exchanged</li>
+                <li>FearVanta reserves the right to decline or refund any donation at their discretion</li>
+            </ul>
+            <div class="highlight-box">
+                <p><strong>No Refund Policy:</strong> All donations made via CashApp to $EG6Jayy are strictly non-refundable. By completing a donation you acknowledge and accept this policy. If you have concerns please contact us before donating.</p>
+            </div>
+        </div>
+
+        <div class="terms-block">
+            <h2>3. Use of Software</h2>
+            <p>By downloading and using Project Obsidian you agree to the following terms:</p>
+            <ul>
+                <li>This software is provided as-is with no warranties or guarantees</li>
+                <li>You may use, modify and share this software freely</li>
+                <li>You may not sell or commercially redistribute this software</li>
+                <li>FearVanta is not responsible for any issues caused by use of this software</li>
+                <li>The software requires a working internet connection for auto-updates</li>
+            </ul>
+        </div>
+
+        <div class="terms-block">
+            <h2>4. Updates & Support</h2>
+            <p>Project Obsidian receives updates via GitHub at no cost. FearVanta makes no guarantee of continued support, updates, or uptime of any associated services. Support is provided on a best-effort basis.</p>
+        </div>
+
+        <div class="terms-block">
+            <h2>5. Intellectual Property</h2>
+            <p>Project Obsidian and the ObsidianHUD branding are created by FearVanta. Black Ops 7 and all associated rank icons and assets are property of Activision. Project Obsidian is an independent fan-made tool and is not affiliated with or endorsed by Activision.</p>
+        </div>
+
+        <div class="terms-block">
+            <h2>6. Changes to Terms</h2>
+            <p>These terms may be updated at any time. Continued use of the software or making a donation after changes are posted constitutes acceptance of the updated terms.</p>
+        </div>
+
+        <div class="terms-block">
+            <h2>7. Contact</h2>
+            <p>If you have any questions about these terms or your donation, you can reach FearVanta via GitHub or stream channels.</p>
+        </div>
+
+    </section>
+
+    <footer>
+        <div class="footer-brand">Project Obsidian by FearVanta — Black Ops 7 Ranked Overlay</div>
+        <div class="footer-links">
+            <a href="index.html">Home</a>
+            <a href="download.html">Download</a>
+            <a href="setup.html">Setup Guide</a>
+            <a href="https://github.com/FearVanta/fearvanta-ranked-overlay" target="_blank">GitHub</a>
+            <a href="terms.html" class="active">Terms</a>
+            <a href="https://cash.app/$EG6Jayy" target="_blank" style="color:#00d632;font-weight:800;">💚 Donate</a>
+        </div>
+    </footer>
+
+</body>
+</html>
