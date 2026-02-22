@@ -6,61 +6,38 @@
     <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;500;600;700;800;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
         :root {
             --bg: #0a0a0f; --surface: #111118; --border: rgba(255,255,255,0.07);
             --accent: #4fd3ff; --accent2: #b44cff; --text: #e8e8f0;
             --muted: rgba(255,255,255,0.35); --success: #00ffaa; --danger: #ff3b3b;
         }
-
         :root.light {
             --bg: #f0f2f5; --surface: #ffffff; --border: rgba(0,0,0,0.1);
             --accent: #0099cc; --accent2: #7c3aed; --text: #1a1a2e;
             --muted: rgba(0,0,0,0.4); --success: #00aa66; --danger: #cc2200;
         }
-
-        :root.light select {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='rgba(0,0,0,0.4)'/%3E%3C/svg%3E");
-        }
-
+        :root.light select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='rgba(0,0,0,0.4)'/%3E%3C/svg%3E"); }
         :root.light #dockLogo { filter: invert(1); }
-
         body { background: var(--bg); color: var(--text); font-family: 'Mulish', sans-serif; font-size: 14px; min-height: 100vh; padding: 12px; overflow-x: hidden; }
-
         .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
-
         .logo { display: flex; align-items: center; gap: 8px; }
         #dockLogo { height: 28px; width: auto; object-fit: contain; transition: filter 0.2s; }
         .logo-text { font-size: 15px; font-weight: 800; letter-spacing: 1px; background: linear-gradient(90deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
         .theme-toggle { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 4px 10px; font-family: 'Mulish', sans-serif; font-size: 11px; font-weight: 600; color: var(--muted); cursor: pointer; transition: all 0.2s; }
         .theme-toggle:hover { color: var(--text); border-color: var(--accent); }
-
         .status-bar { display: flex; align-items: center; gap: 6px; font-size: 11px; font-family: 'Share Tech Mono', monospace; color: var(--muted); margin-bottom: 14px; }
         .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); transition: background 0.3s; }
         .status-dot.ok { background: var(--success); box-shadow: 0 0 6px var(--success); }
         .status-dot.err { background: var(--danger); box-shadow: 0 0 6px var(--danger); }
-
         .field { margin-bottom: 10px; }
         label { display: block; font-size: 11px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
-
-        input[type="text"], input[type="number"], select {
-            width: 100%; background: var(--surface); border: 1px solid var(--border);
-            border-radius: 6px; color: var(--text); font-family: 'Mulish', sans-serif;
-            font-size: 14px; font-weight: 600; padding: 7px 10px; outline: none; transition: border-color 0.2s; appearance: none;
-        }
+        input[type="text"], input[type="number"], select { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: 'Mulish', sans-serif; font-size: 14px; font-weight: 600; padding: 7px 10px; outline: none; transition: border-color 0.2s; appearance: none; }
         input:disabled, select:disabled { opacity: 0.3; cursor: not-allowed; }
         input:focus, select:focus { border-color: var(--accent); }
-
-        select {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='rgba(255,255,255,0.3)'/%3E%3C/svg%3E");
-            background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px; cursor: pointer;
-        }
-
+        select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='rgba(255,255,255,0.3)'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px; cursor: pointer; }
         .btn-update { width: 100%; padding: 10px; background: linear-gradient(90deg, var(--accent), var(--accent2)); border: none; border-radius: 6px; color: #000; font-family: 'Mulish', sans-serif; font-size: 14px; font-weight: 800; cursor: pointer; transition: opacity 0.2s; margin-top: 4px; }
         .btn-update:hover { opacity: 0.85; }
         .btn-update:disabled { opacity: 0.4; cursor: not-allowed; }
-
         .toast { position: fixed; bottom: 16px; left: 12px; right: 12px; padding: 10px 14px; border-radius: 8px; font-size: 12px; font-weight: 700; opacity: 0; transition: opacity 0.3s; pointer-events: none; text-align: center; }
         .toast.success { background: var(--success); color: #000; }
         .toast.error { background: var(--danger); color: #fff; }
@@ -71,7 +48,7 @@
 
     <div class="header">
         <div class="logo">
-            <img id="dockLogo" src="assets/icons/ProjectObsidian.png" alt="Project Obsidian">
+            <img id="dockLogo" src="/FearVanta-Ranked-Overlay/overlay/assets/icons/ProjectObsidian.png" alt="Project Obsidian">
             <span class="logo-text">PROJECT OBSIDIAN</span>
         </div>
         <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">☀ LIGHT</button>
@@ -86,17 +63,14 @@
         <label>Activision Username</label>
         <input type="text" id="username" placeholder="@fearvanta" />
     </div>
-
     <div class="field">
         <label>SR (Skill Rating)</label>
         <input type="number" id="sr" min="0" max="99999" placeholder="0" />
     </div>
-
     <div class="field">
         <label>Top 250 Position</label>
         <input type="number" id="leaderboard_pos" min="0" max="250" placeholder="0 = not on leaderboard" disabled />
     </div>
-
     <div class="field">
         <label>Layout</label>
         <select id="layout">
@@ -104,7 +78,6 @@
             <option value="vertical">Vertical</option>
         </select>
     </div>
-
     <div class="field">
         <label>Background Template</label>
         <select id="background">
@@ -119,14 +92,12 @@
             <option value="marble-white">Marble White</option>
         </select>
     </div>
-
     <div class="field">
         <label>Background Opacity</label>
         <input type="number" id="opacity" min="0" max="1" step="0.05" placeholder="0.85" />
     </div>
 
     <button class="btn-update" id="updateBtn" onclick="saveToSupabase()">UPDATE OVERLAY</button>
-
     <div class="toast" id="toast"></div>
 
     <script>
@@ -138,6 +109,25 @@
             "Content-Type": "application/json"
         };
 
+        // Prevent auto-refresh from resetting fields while user is typing
+        let userEditing = false;
+        let editTimeout = null;
+
+        document.querySelectorAll("input, select").forEach(el => {
+            el.addEventListener("focus", () => {
+                userEditing = true;
+                clearTimeout(editTimeout);
+            });
+            el.addEventListener("blur", () => {
+                editTimeout = setTimeout(() => { userEditing = false; }, 3000);
+            });
+            el.addEventListener("change", () => {
+                userEditing = true;
+                clearTimeout(editTimeout);
+                editTimeout = setTimeout(() => { userEditing = false; }, 3000);
+            });
+        });
+
         function showToast(msg, type = "success") {
             const t = document.getElementById("toast");
             t.textContent = msg;
@@ -145,22 +135,23 @@
             setTimeout(() => t.className = `toast ${type}`, 3000);
         }
 
+        function populateFields(d) {
+            document.getElementById("username").value = d.username || "";
+            document.getElementById("sr").value = d.sr ?? 0;
+            document.getElementById("leaderboard_pos").value = d.leaderboard_pos ?? 0;
+            document.getElementById("layout").value = d.layout || "horizontal";
+            document.getElementById("background").value = d.background || "classic-dark";
+            document.getElementById("opacity").value = d.opacity ?? 0.85;
+            document.getElementById("leaderboard_pos").disabled = (parseInt(d.sr) || 0) < 10000;
+        }
+
         async function loadFromSupabase() {
+            if (userEditing) return; // Don't reset while user is editing
             try {
                 const res = await fetch(`${SUPABASE_URL}/rest/v1/overlay_config?id=eq.1`, { headers: HEADERS });
                 const data = await res.json();
                 if (data && data[0]) {
-                    const d = data[0];
-                    document.getElementById("username").value = d.username || "";
-                    document.getElementById("sr").value = d.sr || 0;
-                    document.getElementById("leaderboard_pos").value = d.leaderboard_pos || 0;
-                    document.getElementById("layout").value = d.layout || "horizontal";
-                    document.getElementById("background").value = d.background || "classic-dark";
-                    document.getElementById("opacity").value = d.opacity ?? 0.85;
-
-                    const sr = parseInt(d.sr) || 0;
-                    document.getElementById("leaderboard_pos").disabled = sr < 10000;
-
+                    populateFields(data[0]);
                     document.getElementById("statusDot").className = "status-dot ok";
                     document.getElementById("statusText").textContent = "Connected to Supabase";
                 }
@@ -191,30 +182,27 @@
                     headers: { ...HEADERS, "Prefer": "return=minimal" },
                     body: JSON.stringify(config)
                 });
-
                 if (res.ok) {
                     showToast("✓ Overlay updated!", "success");
+                    userEditing = false; // Allow refresh now
                 } else {
-                    showToast("Could not save — check connection", "error");
+                    const err = await res.text();
+                    showToast("Could not save: " + err, "error");
                 }
             } catch(e) {
-                showToast("Error saving to Supabase", "error");
+                showToast("Error: " + e.message, "error");
             }
 
             btn.disabled = false;
             btn.textContent = "UPDATE OVERLAY";
         }
 
-        // Lock/unlock Top 250 based on SR
+        // SR lock/unlock Top 250
         document.getElementById("sr").addEventListener("input", function() {
             const sr = parseInt(this.value) || 0;
             const posField = document.getElementById("leaderboard_pos");
-            if (sr >= 10000) {
-                posField.disabled = false;
-            } else {
-                posField.disabled = true;
-                posField.value = 0;
-            }
+            posField.disabled = sr < 10000;
+            if (sr < 10000) posField.value = 0;
         });
 
         // Theme toggle
@@ -223,6 +211,7 @@
             document.getElementById("themeToggle").textContent = isLight ? "🌙 DARK" : "☀ LIGHT";
         }
 
+        // Initial load + poll every 5s (respects userEditing flag)
         loadFromSupabase();
         setInterval(loadFromSupabase, 5000);
     </script>
