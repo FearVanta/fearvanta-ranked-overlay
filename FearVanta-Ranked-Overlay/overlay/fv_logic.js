@@ -9,7 +9,6 @@ const HEADERS = {
     "Authorization": `Bearer ${SUPABASE_KEY}`
 };
 
-// Base path for icons on Vercel
 const ICON_BASE = "/FearVanta-Ranked-Overlay/overlay/assets/icons";
 
 const TIERS = [
@@ -34,13 +33,6 @@ const TIERS = [
     { name: "Iridescent",   min: 10000, max: 99999, icon: "iridescent", color: "#b44cff" },
 ];
 
-function getTierFromSR(sr, pos) {
-    if (sr >= 10000 && pos >= 1 && pos <= 250) {
-        return { name: `Top 250 · #${pos}`, icon: "top250", color: "#ffffff" };
-    }
-    return TIERS.find(t => sr >= t.min && sr < t.max) || TIERS[0];
-}
-
 const BACKGROUNDS = {
     "classic-dark":  (o) => `rgba(10,10,10,${o})`,
     "dark-glass":    (o) => `rgba(20,20,30,${o})`,
@@ -52,6 +44,13 @@ const BACKGROUNDS = {
     "frozen-ice":    (o) => `rgba(0,20,40,${o})`,
     "marble-white":  (o) => `rgba(240,240,245,${o})`
 };
+
+function getTierFromSR(sr, pos) {
+    if (sr >= 10000 && pos >= 1 && pos <= 250) {
+        return { name: `Top 250 · #${pos}`, icon: "top250", color: "#ffffff" };
+    }
+    return TIERS.find(t => sr >= t.min && sr < t.max) || TIERS[0];
+}
 
 let lastIcon = null;
 let lastUpdatedAt = null;
@@ -71,25 +70,32 @@ function applyConfig(data) {
     // SR value
     document.getElementById("srValue").textContent = sr.toLocaleString();
 
-    // Rank color
+    // Rank color CSS variable
     document.documentElement.style.setProperty("--rank-color", tier.color);
 
-    // Icon — only reload video if rank changed
+    // Icon — use correct source element ID from overlay HTML
     if (tier.icon !== lastIcon) {
         lastIcon = tier.icon;
         const video = document.getElementById("rankIcon");
-        const source = video.querySelector("source");
+        const source = document.getElementById("rankIconSource");
         source.src = `${ICON_BASE}/${tier.icon}.webm`;
         video.load();
         video.play().catch(() => {});
     }
 
-    // Layout
-    document.getElementById("overlay").className = data.layout === "vertical" ? "vertical" : "";
+    // Layout — set class on overlay div
+    const overlay = document.getElementById("overlay");
+    overlay.className = data.layout === "vertical" ? "vertical" : "";
 
-    // Background
+    // Background — apply directly via inline style on overlay div
     const bgFn = BACKGROUNDS[data.background] || BACKGROUNDS["classic-dark"];
-    document.getElementById("overlayBg").style.background = bgFn(opacity);
+    overlay.style.background = bgFn(opacity);
+
+    // SR icon path fix for Vercel
+    const srIcon = document.getElementById("srIcon");
+    if (srIcon && !srIcon.src.includes("sr.png")) {
+        srIcon.src = `${ICON_BASE}/sr.png`;
+    }
 }
 
 async function pollConfig() {
@@ -99,7 +105,6 @@ async function pollConfig() {
         });
         const data = await res.json();
         if (data && data[0]) {
-            // Only re-apply if something changed
             if (data[0].updated_at !== lastUpdatedAt) {
                 lastUpdatedAt = data[0].updated_at;
                 applyConfig(data[0]);
@@ -111,6 +116,10 @@ async function pollConfig() {
 }
 
 window.addEventListener("DOMContentLoaded", () => {
+    // Fix sr.png path immediately on load
+    const srIcon = document.getElementById("srIcon");
+    if (srIcon) srIcon.src = `${ICON_BASE}/sr.png`;
+
     pollConfig();
     setInterval(pollConfig, 3000);
 });
