@@ -1,16 +1,10 @@
 {
     "version": 2,
-    "builds": [
-        {
-            "src": "overlay/**",
-            "use": "@vercel/static"
-        },
-        {
-            "src": "*.html",
-            "use": "@vercel/static"
-        }
-    ],
     "routes": [
+        {
+            "src": "/overlay/(.*)",
+            "dest": "/FearVanta-Ranked-Overlay/overlay/$1"
+        },
         {
             "src": "/(.*)",
             "dest": "/$1"
