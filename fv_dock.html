@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Project Obsidian — Control Dock</title>
+    <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;500;600;700;800;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #0a0a0f; --surface: #111118; --border: rgba(255,255,255,0.07);
+            --accent: #4fd3ff; --accent2: #b44cff; --text: #e8e8f0;
+            --muted: rgba(255,255,255,0.35); --success: #00ffaa; --danger: #ff3b3b;
+        }
+
+        :root.light {
+            --bg: #f0f2f5; --surface: #ffffff; --border: rgba(0,0,0,0.1);
+            --accent: #0099cc; --accent2: #7c3aed; --text: #1a1a2e;
+            --muted: rgba(0,0,0,0.4); --success: #00aa66; --danger: #cc2200;
+        }
+
+        :root.light select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='rgba(0,0,0,0.4)'/%3E%3C/svg%3E");
+        }
+
+        :root.light #dockLogo { filter: invert(1); }
+
+        body { background: var(--bg); color: var(--text); font-family: 'Mulish', sans-serif; font-size: 14px; min-height: 100vh; padding: 12px; overflow-x: hidden; }
+
+        .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+
+        .logo { display: flex; align-items: center; gap: 8px; }
+        #dockLogo { height: 28px; width: auto; object-fit: contain; transition: filter 0.2s; }
+        .logo-text { font-size: 15px; font-weight: 800; letter-spacing: 1px; background: linear-gradient(90deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        .theme-toggle { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 4px 10px; font-family: 'Mulish', sans-serif; font-size: 11px; font-weight: 600; color: var(--muted); cursor: pointer; transition: all 0.2s; }
+        .theme-toggle:hover { color: var(--text); border-color: var(--accent); }
+
+        .status-bar { display: flex; align-items: center; gap: 6px; font-size: 11px; font-family: 'Share Tech Mono', monospace; color: var(--muted); margin-bottom: 14px; }
+        .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); transition: background 0.3s; }
+        .status-dot.ok { background: var(--success); box-shadow: 0 0 6px var(--success); }
+        .status-dot.err { background: var(--danger); box-shadow: 0 0 6px var(--danger); }
+
+        .field { margin-bottom: 10px; }
+        label { display: block; font-size: 11px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
+
+        input[type="text"], input[type="number"], select {
+            width: 100%; background: var(--surface); border: 1px solid var(--border);
+            border-radius: 6px; color: var(--text); font-family: 'Mulish', sans-serif;
+            font-size: 14px; font-weight: 600; padding: 7px 10px; outline: none; transition: border-color 0.2s; appearance: none;
+        }
+        input:disabled, select:disabled { opacity: 0.3; cursor: not-allowed; }
+        input:focus, select:focus { border-color: var(--accent); }
+
+        select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='rgba(255,255,255,0.3)'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px; cursor: pointer;
+        }
+
+        .btn-update { width: 100%; padding: 10px; background: linear-gradient(90deg, var(--accent), var(--accent2)); border: none; border-radius: 6px; color: #000; font-family: 'Mulish', sans-serif; font-size: 14px; font-weight: 800; cursor: pointer; transition: opacity 0.2s; margin-top: 4px; }
+        .btn-update:hover { opacity: 0.85; }
+        .btn-update:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        .toast { position: fixed; bottom: 16px; left: 12px; right: 12px; padding: 10px 14px; border-radius: 8px; font-size: 12px; font-weight: 700; opacity: 0; transition: opacity 0.3s; pointer-events: none; text-align: center; }
+        .toast.success { background: var(--success); color: #000; }
+        .toast.error { background: var(--danger); color: #fff; }
+        .toast.show { opacity: 1; pointer-events: auto; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="logo">
+            <img id="dockLogo" src="assets/icons/ProjectObsidian.png" alt="Project Obsidian">
+            <span class="logo-text">PROJECT OBSIDIAN</span>
+        </div>
+        <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">☀ LIGHT</button>
+    </div>
+
+    <div class="status-bar">
+        <div class="status-dot" id="statusDot"></div>
+        <span id="statusText">Connecting...</span>
+    </div>
+
+    <div class="field">
+        <label>Activision Username</label>
+        <input type="text" id="username" placeholder="@fearvanta" />
+    </div>
+
+    <div class="field">
+        <label>SR (Skill Rating)</label>
+        <input type="number" id="sr" min="0" max="99999" placeholder="0" />
+    </div>
+
+    <div class="field">
+        <label>Top 250 Position</label>
+        <input type="number" id="leaderboard_pos" min="0" max="250" placeholder="0 = not on leaderboard" disabled />
+    </div>
+
+    <div class="field">
+        <label>Layout</label>
+        <select id="layout">
+            <option value="horizontal">Horizontal</option>
+            <option value="vertical">Vertical</option>
+        </select>
+    </div>
+
+    <div class="field">
+        <label>Background Template</label>
+        <select id="background">
+            <option value="classic-dark">Classic Dark</option>
+            <option value="dark-glass">Dark Glass</option>
+            <option value="neon-grid">Neon Grid</option>
+            <option value="cyber-wave">Cyber Wave</option>
+            <option value="matrix">Matrix</option>
+            <option value="aurora">Aurora</option>
+            <option value="crimson-flame">Crimson Flame</option>
+            <option value="frozen-ice">Frozen Ice</option>
+            <option value="marble-white">Marble White</option>
+        </select>
+    </div>
+
+    <div class="field">
+        <label>Background Opacity</label>
+        <input type="number" id="opacity" min="0" max="1" step="0.05" placeholder="0.85" />
+    </div>
+
+    <button class="btn-update" id="updateBtn" onclick="saveToSupabase()">UPDATE OVERLAY</button>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const SUPABASE_URL = "https://efybigjlkignaxvomcgn.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVmeWJpZ2psa2lnbmF4dm9tY2duIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3MjM4NzIsImV4cCI6MjA4NzI5OTg3Mn0.IMp95Z50w7Z2OQut2wvw3BQM7TVCt6UcQmOJbOijA8o";
+        const HEADERS = {
+            "apikey": SUPABASE_KEY,
+            "Authorization": `Bearer ${SUPABASE_KEY}`,
+            "Content-Type": "application/json"
+        };
+
+        function showToast(msg, type = "success") {
+            const t = document.getElementById("toast");
+            t.textContent = msg;
+            t.className = `toast ${type} show`;
+            setTimeout(() => t.className = `toast ${type}`, 3000);
+        }
+
+        async function loadFromSupabase() {
+            try {
+                const res = await fetch(`${SUPABASE_URL}/rest/v1/overlay_config?id=eq.1`, { headers: HEADERS });
+                const data = await res.json();
+                if (data && data[0]) {
+                    const d = data[0];
+                    document.getElementById("username").value = d.username || "";
+                    document.getElementById("sr").value = d.sr || 0;
+                    document.getElementById("leaderboard_pos").value = d.leaderboard_pos || 0;
+                    document.getElementById("layout").value = d.layout || "horizontal";
+                    document.getElementById("background").value = d.background || "classic-dark";
+                    document.getElementById("opacity").value = d.opacity ?? 0.85;
+
+                    const sr = parseInt(d.sr) || 0;
+                    document.getElementById("leaderboard_pos").disabled = sr < 10000;
+
+                    document.getElementById("statusDot").className = "status-dot ok";
+                    document.getElementById("statusText").textContent = "Connected to Supabase";
+                }
+            } catch(e) {
+                document.getElementById("statusDot").className = "status-dot err";
+                document.getElementById("statusText").textContent = "Cannot reach Supabase";
+            }
+        }
+
+        async function saveToSupabase() {
+            const btn = document.getElementById("updateBtn");
+            btn.disabled = true;
+            btn.textContent = "SAVING...";
+
+            const config = {
+                username: document.getElementById("username").value,
+                sr: parseInt(document.getElementById("sr").value) || 0,
+                leaderboard_pos: parseInt(document.getElementById("leaderboard_pos").value) || 0,
+                layout: document.getElementById("layout").value,
+                background: document.getElementById("background").value,
+                opacity: parseFloat(document.getElementById("opacity").value) || 0.85,
+                updated_at: new Date().toISOString()
+            };
+
+            try {
+                const res = await fetch(`${SUPABASE_URL}/rest/v1/overlay_config?id=eq.1`, {
+                    method: "PATCH",
+                    headers: { ...HEADERS, "Prefer": "return=minimal" },
+                    body: JSON.stringify(config)
+                });
+
+                if (res.ok) {
+                    showToast("✓ Overlay updated!", "success");
+                } else {
+                    showToast("Could not save — check connection", "error");
+                }
+            } catch(e) {
+                showToast("Error saving to Supabase", "error");
+            }
+
+            btn.disabled = false;
+            btn.textContent = "UPDATE OVERLAY";
+        }
+
+        // Lock/unlock Top 250 based on SR
+        document.getElementById("sr").addEventListener("input", function() {
+            const sr = parseInt(this.value) || 0;
+            const posField = document.getElementById("leaderboard_pos");
+            if (sr >= 10000) {
+                posField.disabled = false;
+            } else {
+                posField.disabled = true;
+                posField.value = 0;
+            }
+        });
+
+        // Theme toggle
+        function toggleTheme() {
+            const isLight = document.documentElement.classList.toggle("light");
+            document.getElementById("themeToggle").textContent = isLight ? "🌙 DARK" : "☀ LIGHT";
+        }
+
+        loadFromSupabase();
+        setInterval(loadFromSupabase, 5000);
+    </script>
+</body>
+</html>
